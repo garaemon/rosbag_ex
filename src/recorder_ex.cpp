@@ -108,7 +108,8 @@ RecorderOptions::RecorderOptions() :
     limit(0),
     split(false),
     max_size(0),
-    max_duration(-1.0)
+    max_duration(-1.0),
+    min_space(0)
 {
 }
 
@@ -609,6 +610,7 @@ bool Recorder::scheduledCheckDisk() {
 }
 
 bool Recorder::checkDisk() {
+    ROS_INFO("min_space: %ld", options_.min_space);
 #if BOOST_FILESYSTEM_VERSION < 3
     struct statvfs fiData;
     if ((statvfs(bag_.getFileName().c_str(), &fiData)) < 0)
@@ -618,6 +620,7 @@ bool Recorder::checkDisk() {
     }
     unsigned long long free_space = 0;
     free_space = (unsigned long long) (fiData.f_bsize) * (unsigned long long) (fiData.f_bavail);
+    ROS_INFO("free_space: %ld", free_space);
     if (free_space < options_.min_space)
     {
         ROS_ERROR("Less than %s of space free on disk with %s.  Disabling recording.", options_.min_space_str.c_str(), bag_.getFileName().c_str());
@@ -646,6 +649,8 @@ bool Recorder::checkDisk() {
         writing_enabled_ = false;
         return false;
     }
+    ROS_INFO("free_space: %ld", info.available);
+    if (options_.min_space != 0) {
     if ( info.available < options_.min_space)
     {
         ROS_ERROR("Less than %s of space free on disk with %s.  Disabling recording.", options_.min_space_str.c_str(), bag_.getFileName().c_str());
@@ -659,6 +664,10 @@ bool Recorder::checkDisk() {
     }
     else
     {
+        writing_enabled_ = true;
+    }
+    }
+    else {
         writing_enabled_ = true;
     }
 #endif
