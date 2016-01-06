@@ -32,7 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 ********************************************************************/
 
-#include "rosbag/recorder.h"
+#include "rosbag_ex/recorder_ex.h"
 #include "rosbag/exceptions.h"
 
 #include "boost/program_options.hpp"
@@ -42,8 +42,8 @@
 namespace po = boost::program_options;
 
 //! Parse the command-line arguments for recorder options
-rosbag::RecorderOptions parseOptions(int argc, char** argv) {
-    rosbag::RecorderOptions opts;
+rosbag_ex::RecorderOptions parseOptions(int argc, char** argv) {
+  rosbag_ex::RecorderOptions opts;
 
     po::options_description desc("Allowed options");
 
@@ -63,7 +63,7 @@ rosbag::RecorderOptions parseOptions(int argc, char** argv) {
       ("topic", po::value< std::vector<std::string> >(), "topic to record")
       ("size", po::value<int>(), "The maximum size of the bag to record in MB.")
       ("duration", po::value<std::string>(), "Record a bag of maximum duration in seconds, unless 'm', or 'h' is appended.")
-      ("node", po::value<std::string>(), "Record all topics subscribed to by a specific node.");
+      ("node", po::value<std::vector<std::string> >(), "Record all topics subscribed to by a specific node.");
 
   
     po::positional_options_description p;
@@ -183,8 +183,12 @@ rosbag::RecorderOptions parseOptions(int argc, char** argv) {
     }
     if (vm.count("node"))
     {
-      opts.node = vm["node"].as<std::string>();
-      std::cout << "Recording from: " << opts.node << std::endl;
+      opts.nodes = vm["node"].as<std::vector<std::string> >();
+      std::cout << "Recording from: ";
+      for (size_t i = 0; i < opts.nodes.size(); i++) {
+        std::cout << opts.nodes[i] << ", ";
+      }
+      std::cout << std::endl;
     }
 
     // Every non-option argument is assumed to be a topic
@@ -213,7 +217,7 @@ int main(int argc, char** argv) {
     ros::init(argc, argv, "record", ros::init_options::AnonymousName);
 
     // Parse the command-line options
-    rosbag::RecorderOptions opts;
+    rosbag_ex::RecorderOptions opts;
     try {
         opts = parseOptions(argc, argv);
     }
@@ -227,7 +231,7 @@ int main(int argc, char** argv) {
     }
 
     // Run the recorder
-    rosbag::Recorder recorder(opts);
+    rosbag_ex::Recorder recorder(opts);
     int result = recorder.run();
     
     return result;

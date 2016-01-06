@@ -101,7 +101,7 @@ add_definitions(-D_FILE_OFFSET_BITS=64)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+ INCLUDE_DIRS include
 #  LIBRARIES rosbag_ex
 #  CATKIN_DEPENDS rosbag std_msgs
 #  DEPENDS system_lib
@@ -127,7 +127,7 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 # add_dependencies(rosbag_ex ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-add_executable(rosbag_ex src/rosbag_ex.cpp)
+add_executable(rosbag_ex src/rosbag_ex.cpp src/recorder_ex.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
